@@ -68,7 +68,7 @@ def download_csv():
         'E-Mail', 'Benutzername', 'Beruf', 'Firma', 'IBAN', 'BIC'
     ])
     writer.writeheader()
-    for _ in range(10):
+    for _ in range(100):
         writer.writerow(generate_person())
     output.seek(0)
     return send_file(
