@@ -40,7 +40,7 @@
         }
 
         .theme-toggle {
-            position: fixed;
+            position: absolute;
             top: 1em;
             right: 1em;
             z-index: 1000;
@@ -51,7 +51,11 @@
             color: var(--text-color);
         }
 
-        h1 { color: var(--text-color); margin-top: 2em; }
+        h1 {
+            color: var(--text-color);
+            margin-top: 2.5em;
+            text-align: center;
+        }
 
         .person {
             background: var(--box-bg);
@@ -79,9 +83,9 @@
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">🌓</button>
-
     <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">🌓</button>
+
         <h1>🎭 Fake-Personen-Generator</h1>
 
         <div class="person">
