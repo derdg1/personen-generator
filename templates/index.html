@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<title>Fake-Personen-Generator mit Dark Mode Toggle</title>
+<style>
+  body {
+    font-family: sans-serif;
+    padding: 2em;
+    max-width: 700px;
+    margin: auto;
+    background-color: white;
+    color: black;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+  }
+  .dark-mode {
+    background-color: #121212;
+    color: #eee;
+  }
+  .dark-mode .person {
+    background: #2c2c2c;
+    box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+  }
+  .dark-mode button {
+    background: #444;
+    color: white;
+  }
+  .person {
+    background: white;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  button {
+    margin-top: 1em;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    background: #eee;
+    border: none;
+    border-radius: 5px;
+    color: black;
+    cursor: pointer;
+  }
+  form {
+    margin-top: 1em;
+  }
+  #toggleDarkMode {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    z-index: 1000;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    background: #eee;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+  }
+  .dark-mode #toggleDarkMode {
+    background: #444;
+    color: white;
+  }
+</style>
+</head>
+<body>
+  <h1>🎭 Fake-Personen-Generator</h1>
+
+  <!-- Dark Mode Toggle -->
+  <button id="toggleDarkMode" title="Dark Mode an/aus">🌙</button>
+
+  <div class="person">
+    {% for key, value in person.items() %}
+      <p><strong>{{ key }}:</strong> {{ value }}</p>
+    {% endfor %}
+  </div>
+
+  <form action="/" method="get">
+    <button type="submit">🔁 Neue Person</button>
+  </form>
+
+  <form action="/download-csv">
+    <button type="submit">📄 CSV mit 10 Personen</button>
+  </form>
+
+  <form action="/download-vcard">
+    <button type="submit">📇 Als vCard herunterladen</button>
+  </form>
+
+  <form action="/download-pdf">
+    <button type="submit">📄 PDF herunterladen</button>
+  </form>
+    
+  <form action="/filter" method="get">
+    <h3>🔎 Filter</h3>
+    <label for="geschlecht">Geschlecht:</label>
+    <select name="geschlecht" id="geschlecht">
+      <option value="" {% if filter_geschlecht == '' %}selected{% endif %}>Alle</option>
+      <option value="M" {% if filter_geschlecht == 'M' %}selected{% endif %}>Männlich</option>
+      <option value="F" {% if filter_geschlecht == 'F' %}selected{% endif %}>Weiblich</option>
+    </select><br>
+
+    <label for="min">Mindestalter:</label>
+    <input type="number" name="min" id="min" value="{{ filter_min or 18 }}" min="0" max="120"><br>
+
+    <label for="max">Höchstalter:</label>
+    <input type="number" name="max" id="max" value="{{ filter_max or 75 }}" min="0" max="120"><br>
+
+    <button type="submit">🔍 Filtern</button>
+  </form>
+
+<script>
+  const toggleButton = document.getElementById('toggleDarkMode');
+  const body = document.body;
+
+  function updateButtonIcon() {
+    if (body.classList.contains('dark-mode')) {
+      toggleButton.textContent = '☀️';
+      toggleButton.title = 'Light Mode an/aus';
+    } else {
+      toggleButton.textContent = '🌙';
+      toggleButton.title = 'Dark Mode an/aus';
+    }
+  }
+
+  if(localStorage.getItem('darkMode') === 'enabled'){
+    body.classList.add('dark-mode');
+  }
+  updateButtonIcon();
+
+  toggleButton.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    if(body.classList.contains('dark-mode')){
+      localStorage.setItem('darkMode', 'enabled');
+    } else {
+      localStorage.setItem('darkMode', 'disabled');
+    }
+    updateButtonIcon();
+  });
+</script>
+</body>
+</html>
