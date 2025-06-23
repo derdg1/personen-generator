@@ -1,0 +1,21 @@
+{
+    "name": "Fake-Personen-Generator",
+    "short_name": "PersonGen",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2c2c2c",
+    "icons": [
+      {
+        "src": "/static/icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/static/icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
