@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  personen-generator:
+    image: ghcr.io/derdg1/personen-generator:latest
+    container_name: personen-generator
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
