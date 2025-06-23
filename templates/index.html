@@ -15,14 +15,12 @@
             --button-bg: #eee;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #1e1e1e;
-                --text-color: #eee;
-                --box-bg: #2c2c2c;
-                --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
-                --button-bg: #444;
-            }
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --text-color: #eee;
+            --box-bg: #2c2c2c;
+            --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+            --button-bg: #444;
         }
 
         body {
@@ -31,12 +29,25 @@
             padding: 1em;
             background-color: var(--bg-color);
             color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
             max-width: 700px;
             margin: auto;
             padding: 1em;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--text-color);
         }
 
         h1 { color: var(--text-color); }
@@ -68,6 +79,8 @@
 </head>
 <body>
     <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">🌓</button>
+
         <h1>🎭 Fake-Personen-Generator</h1>
 
         <div class="person">
@@ -113,6 +126,25 @@
                 .then(reg => console.log('Service Worker registriert:', reg))
                 .catch(err => console.error('SW Fehler:', err));
         }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Lade gespeichertes Theme beim Start
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
     </script>
 </body>
 </html>
