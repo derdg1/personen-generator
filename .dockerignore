@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+.env
+.venv
+env/
+venv/
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Documentation
+README.md
+*.md
+
+# Docker
+docker-compose.yml
+docker-compose.override.yml
+Dockerfile
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/

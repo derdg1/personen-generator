@@ -1,17 +1,25 @@
 from flask import Flask, render_template, request, jsonify, send_file, Response
 from faker import Faker
 import csv
-import io
+from io import BytesIO
 from datetime import date
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from io import BytesIO
 
 app = Flask(__name__)
 fake = Faker('de_DE')
 
 # Titel, die wir im Namen ausschließen wollen
 titelworte = ['Dr.', 'Prof.', 'Dipl.', 'Dipl.-Ing.', 'Mag.', 'B.Sc.', 'M.Sc.']
+
+def calculate_age(birth_date):
+    """Berechnet das genaue Alter basierend auf dem Geburtsdatum."""
+    today = date.today()
+    age = today.year - birth_date.year
+    # Prüfen ob Geburtstag in diesem Jahr schon war
+    if today.month < birth_date.month or (today.month == birth_date.month and today.day < birth_date.day):
+        age -= 1
+    return age
 
 def generate_person():
     while True:
@@ -24,7 +32,7 @@ def generate_person():
                 'Name': name,
                 'Geschlecht': profile['sex'],
                 'Geburtsdatum': geburtsdatum.strftime('%Y-%m-%d'),
-                'Alter': date.today().year - geburtsdatum.year,
+                'Alter': calculate_age(geburtsdatum),
                 'Adresse': fake.address().replace('\n', ', '),
                 'Telefon': fake.phone_number(),
                 'E-Mail': profile['mail'],
