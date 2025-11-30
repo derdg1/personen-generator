@@ -4,10 +4,12 @@ Ein Flask-basierter Fake-Personen-Generator mit deutschen Daten. Ideal für Test
 
 ## Features
 
-- Realistische deutsche Personendaten
+- Realistische deutsche Personendaten (inkl. Passwörter)
 - Filter nach Geschlecht/Altersbereich
-- Export in CSV, vCard, PDF
-- JSON-REST-API
+- Export in CSV, JSON, vCard, PDF mit konfigurierbarer Anzahl
+- JSON-REST-API mit Batch-Endpoint
+- QR-Code für vCard-Daten
+- Kopieren-Button für einzelne Felder
 - PWA und Docker-Unterstützung
 - Dark Mode
 
@@ -33,13 +35,37 @@ docker run -p 5000:5000 personen-generator
 ```
 
 ## API
-- Einzelne Person: `curl http://localhost:5000/api/person`
-- Gefiltert: `curl "http://localhost:5000/filter?geschlecht=F&min=25&max=40"`
+
+### Einzelne Person
+```bash
+curl http://localhost:5000/api/person
+```
+
+### Mehrere Personen (Batch)
+```bash
+# 50 Personen
+curl "http://localhost:5000/api/persons?count=50"
+
+# 20 Frauen zwischen 25-40 Jahren
+curl "http://localhost:5000/api/persons?count=20&geschlecht=F&min=25&max=40"
+```
+
+### Gefilterte Einzelperson
+```bash
+curl "http://localhost:5000/filter?geschlecht=F&min=25&max=40"
+```
+
+### Export-Endpoints
+- CSV: `/download-csv?count=100`
+- JSON: `/download-json?count=100`
+- vCard: `/download-vcard`
+- PDF: `/download-pdf`
+- QR-Code: `/vcard-qr`
 
 ## Stack
 - **Backend**: Python, Flask, Faker
 - **Frontend**: Vanilla JS, CSS
-- **Export**: ReportLab
+- **Export**: ReportLab, qrcode
 - **Container**: Docker
 
 ---

@@ -79,7 +79,28 @@
             box-sizing: border-box;
         }
 
+        .copy-btn {
+            width: auto;
+            display: inline-block;
+            padding: 0.2em 0.5em;
+            margin-left: 0.5em;
+            font-size: 0.9em;
+            background: var(--button-bg);
+            border: 1px solid var(--text-color);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
         form { margin-top: 1em; }
+
+        h3 {
+            margin-top: 1.5em;
+            color: var(--text-color);
+        }
     </style>
 </head>
 <body>
@@ -90,7 +111,11 @@
 
         <div class="person">
             {% for key, value in person.items() %}
-                <p><strong>{{ key }}:</strong> {{ value }}</p>
+                <p>
+                    <strong>{{ key }}:</strong>
+                    <span id="field-{{ key }}">{{ value }}</span>
+                    <button class="copy-btn" onclick="copyToClipboard('field-{{ key }}')" title="Kopieren">📋</button>
+                </p>
             {% endfor %}
         </div>
 
@@ -98,8 +123,18 @@
             <button type="submit">🔁 Neue Person</button>
         </form>
 
-        <form action="/download-csv">
-            <button type="submit">📄 CSV mit 100 Personen</button>
+        <h3>📥 Export-Optionen</h3>
+
+        <form action="/download-csv" method="get">
+            <label for="csv-count">Anzahl Personen:</label>
+            <input type="number" name="count" id="csv-count" value="100" min="1" max="10000">
+            <button type="submit">📄 CSV Export</button>
+        </form>
+
+        <form action="/download-json" method="get">
+            <label for="json-count">Anzahl Personen:</label>
+            <input type="number" name="count" id="json-count" value="100" min="1" max="10000">
+            <button type="submit">📊 JSON Export</button>
         </form>
 
         <form action="/download-vcard">
@@ -109,6 +144,11 @@
         <form action="/download-pdf">
             <button type="submit">🖨️ Als PDF herunterladen</button>
         </form>
+
+        <div style="text-align: center; margin-top: 1em;">
+            <img id="qr-code" src="/vcard-qr" alt="vCard QR-Code" style="max-width: 200px; cursor: pointer;" onclick="this.requestFullscreen()" title="Klicken für Vollbild">
+            <p style="font-size: 0.9em; color: var(--text-color);">📱 QR-Code scannen für vCard</p>
+        </div>
 
         <form action="/filter" method="get">
             <h3>🔎 Filter</h3>
@@ -144,6 +184,57 @@
             } else {
                 html.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+
+            // Moderne Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyFeedback(elementId);
+                }).catch(err => {
+                    console.error('Fehler beim Kopieren:', err);
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showCopyFeedback();
+            } catch (err) {
+                console.error('Fallback-Kopieren fehlgeschlagen:', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showCopyFeedback(elementId) {
+            // Visuelles Feedback
+            const element = elementId ? document.getElementById(elementId) : null;
+            if (element) {
+                element.style.backgroundColor = '#4CAF50';
+                element.style.color = 'white';
+                element.style.padding = '2px 5px';
+                element.style.borderRadius = '3px';
+                element.style.transition = 'all 0.3s';
+
+                setTimeout(() => {
+                    element.style.backgroundColor = '';
+                    element.style.color = '';
+                    element.style.padding = '';
+                }, 1000);
             }
         }
 
