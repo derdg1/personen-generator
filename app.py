@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, send_file, Response
 from faker import Faker
 import csv
-from io import BytesIO
+from io import BytesIO, StringIO
 from datetime import date
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -70,7 +70,7 @@ def filter_person():
 
 @app.route('/download-csv')
 def download_csv():
-    output = io.StringIO()
+    output = StringIO()
     writer = csv.DictWriter(output, fieldnames=[
         'Name', 'Geschlecht', 'Geburtsdatum', 'Alter', 'Adresse', 'Telefon',
         'E-Mail', 'Benutzername', 'Beruf', 'Firma', 'IBAN', 'BIC'
@@ -80,7 +80,7 @@ def download_csv():
         writer.writerow(generate_person())
     output.seek(0)
     return send_file(
-        io.BytesIO(output.getvalue().encode('utf-8')),
+        BytesIO(output.getvalue().encode('utf-8')),
         mimetype='text/csv',
         as_attachment=True,
         download_name='personen.csv'
