@@ -3,182 +3,567 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#2c2c2c">
+    <meta name="theme-color" content="#6366f1">
     <title>Fake-Personen-Generator</title>
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
-            --bg-color: #f5f5f5;
-            --text-color: #111;
-            --box-bg: #fff;
-            --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            --button-bg: #eee;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-light: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
         [data-theme="dark"] {
-            --bg-color: #1e1e1e;
-            --text-color: #eee;
-            --box-bg: #2c2c2c;
-            --box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
-            --button-bg: #444;
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --secondary: #a78bfa;
+            --success: #34d399;
+            --bg-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --bg-light: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
         }
 
         body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 1em;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .container {
-            max-width: 700px;
-            margin: auto;
-            padding: 1em;
+        .header {
+            background: var(--bg-gradient);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
             position: relative;
         }
 
         .theme-toggle {
             position: absolute;
-            top: 1em;
-            right: 1em;
-            z-index: 1000;
-            background: none;
-            border: none;
-            font-size: 1.5em;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-color);
+            transition: all 0.3s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg) scale(1.1);
         }
 
         h1 {
-            color: var(--text-color);
-            margin-top: 2.5em;
-            text-align: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .person {
-            background: var(--box-bg);
-            padding: 1em;
-            border-radius: 8px;
-            box-shadow: var(--box-shadow);
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
         }
 
-        .person p { margin: 0.3em 0; }
+        .container {
+            max-width: 1200px;
+            margin: -3rem auto 2rem;
+            padding: 0 1rem;
+        }
 
-        button, input, select {
-            margin-top: 0.5em;
-            padding: 0.5em;
-            font-size: 1em;
-            background: var(--button-bg);
-            border: none;
-            border-radius: 5px;
-            color: var(--text-color);
-            cursor: pointer;
-            width: 100%;
-            box-sizing: border-box;
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-xl), 0 0 0 1px var(--primary);
+        }
+
+        .person-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .person-field {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .person-field::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+        }
+
+        .person-field:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .person-field:hover::before {
+            transform: scaleY(1);
+        }
+
+        .field-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .field-value {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            word-break: break-word;
         }
 
         .copy-btn {
-            width: auto;
-            display: inline-block;
-            padding: 0.2em 0.5em;
-            margin-left: 0.5em;
-            font-size: 0.9em;
-            background: var(--button-bg);
-            border: 1px solid var(--text-color);
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.4rem 0.6rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            flex-shrink: 0;
         }
 
-        .copy-btn:hover {
+        .person-field:hover .copy-btn {
             opacity: 1;
         }
 
-        form { margin-top: 1em; }
+        .copy-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
 
-        h3 {
-            margin-top: 1.5em;
-            color: var(--text-color);
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 1.5rem;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .export-card {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .export-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border: 2px dashed var(--border);
+        }
+
+        .qr-code {
+            max-width: 220px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            margin: 1rem auto;
+        }
+
+        .qr-code:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .filter-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .copied-feedback {
+            animation: copyPulse 0.6s ease;
+        }
+
+        @keyframes copyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); background-color: var(--success); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .container {
+                margin-top: -2rem;
+            }
+
+            .person-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--primary);
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">🌓</button>
-
+    <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln" aria-label="Toggle theme">
+            🌓
+        </button>
         <h1>🎭 Fake-Personen-Generator</h1>
+        <p class="subtitle">Realistische deutsche Testdaten auf Knopfdruck</p>
+    </div>
 
-        <div class="person">
-            {% for key, value in person.items() %}
-                <p>
-                    <strong>{{ key }}:</strong>
-                    <span id="field-{{ key }}">{{ value }}</span>
-                    <button class="copy-btn" onclick="copyToClipboard('field-{{ key }}')" title="Kopieren">📋</button>
+    <div class="container">
+        <!-- Personen-Daten Card -->
+        <div class="card">
+            <div class="section-title">👤 Personendaten</div>
+            <div class="person-grid">
+                {% for key, value in person.items() %}
+                <div class="person-field">
+                    <div class="field-label">{{ key }}</div>
+                    <div class="field-value">
+                        <span id="field-{{ key }}">{{ value }}</span>
+                        <button class="copy-btn" onclick="copyToClipboard('field-{{ key }}')" title="Kopieren" aria-label="Copy {{ key }}">
+                            📋
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <form action="/" method="get" style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-success">
+                    🔄 Neue Person generieren
+                </button>
+            </form>
+        </div>
+
+        <!-- Export Optionen -->
+        <div class="card">
+            <div class="section-title">📥 Export-Optionen</div>
+            <div class="export-grid">
+                <div class="export-card">
+                    <form action="/download-csv" method="get">
+                        <div class="input-group">
+                            <label for="csv-count">📄 CSV Export</label>
+                            <input type="number" name="count" id="csv-count" value="100" min="1" max="10000" placeholder="Anzahl">
+                        </div>
+                        <button type="submit" class="btn">CSV Herunterladen</button>
+                    </form>
+                </div>
+
+                <div class="export-card">
+                    <form action="/download-json" method="get">
+                        <div class="input-group">
+                            <label for="json-count">📊 JSON Export</label>
+                            <input type="number" name="count" id="json-count" value="100" min="1" max="10000" placeholder="Anzahl">
+                        </div>
+                        <button type="submit" class="btn">JSON Herunterladen</button>
+                    </form>
+                </div>
+
+                <div class="export-card">
+                    <form action="/download-vcard">
+                        <div class="input-group">
+                            <label>📇 vCard Export</label>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                Kontakt-Datei für Apps
+                            </p>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">vCard Herunterladen</button>
+                    </form>
+                </div>
+
+                <div class="export-card">
+                    <form action="/download-pdf">
+                        <div class="input-group">
+                            <label>🖨️ PDF Export</label>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                Druckfähiges Format
+                            </p>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">PDF Herunterladen</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR-Code Section -->
+        <div class="card">
+            <div class="section-title">📱 QR-Code</div>
+            <div class="qr-section">
+                <img class="qr-code" src="/vcard-qr" alt="vCard QR-Code" onclick="this.requestFullscreen()" title="Klicken für Vollbild">
+                <p style="color: var(--text-secondary); margin-top: 1rem;">
+                    Scanne den QR-Code mit deinem Smartphone, um die Kontaktdaten zu importieren
                 </p>
-            {% endfor %}
+            </div>
         </div>
 
-        <form action="/" method="get">
-            <button type="submit">🔁 Neue Person</button>
-        </form>
+        <!-- Filter Section -->
+        <div class="card filter-section">
+            <div class="section-title">🔍 Filter & Suche</div>
+            <form action="/filter" method="get">
+                <div class="filter-grid">
+                    <div class="input-group">
+                        <label for="geschlecht">Geschlecht</label>
+                        <select name="geschlecht" id="geschlecht">
+                            <option value="">Alle</option>
+                            <option value="M">Männlich</option>
+                            <option value="F">Weiblich</option>
+                        </select>
+                    </div>
 
-        <h3>📥 Export-Optionen</h3>
+                    <div class="input-group">
+                        <label for="min">Mindestalter</label>
+                        <input type="number" name="min" id="min" value="18" min="18" max="75">
+                    </div>
 
-        <form action="/download-csv" method="get">
-            <label for="csv-count">Anzahl Personen:</label>
-            <input type="number" name="count" id="csv-count" value="100" min="1" max="10000">
-            <button type="submit">📄 CSV Export</button>
-        </form>
-
-        <form action="/download-json" method="get">
-            <label for="json-count">Anzahl Personen:</label>
-            <input type="number" name="count" id="json-count" value="100" min="1" max="10000">
-            <button type="submit">📊 JSON Export</button>
-        </form>
-
-        <form action="/download-vcard">
-            <button type="submit">📇 Als vCard herunterladen</button>
-        </form>
-
-        <form action="/download-pdf">
-            <button type="submit">🖨️ Als PDF herunterladen</button>
-        </form>
-
-        <div style="text-align: center; margin-top: 1em;">
-            <img id="qr-code" src="/vcard-qr" alt="vCard QR-Code" style="max-width: 200px; cursor: pointer;" onclick="this.requestFullscreen()" title="Klicken für Vollbild">
-            <p style="font-size: 0.9em; color: var(--text-color);">📱 QR-Code scannen für vCard</p>
+                    <div class="input-group">
+                        <label for="max">Höchstalter</label>
+                        <input type="number" name="max" id="max" value="75" min="18" max="75">
+                    </div>
+                </div>
+                <button type="submit" class="btn">
+                    🔍 Gefilterte Person suchen
+                </button>
+            </form>
         </div>
-
-        <form action="/filter" method="get">
-            <h3>🔎 Filter</h3>
-            <label for="geschlecht">Geschlecht:</label>
-            <select name="geschlecht" id="geschlecht">
-                <option value="">Alle</option>
-                <option value="M">Männlich</option>
-                <option value="F">Weiblich</option>
-            </select><br>
-
-            <label for="min">Mindestalter:</label>
-            <input type="number" name="min" id="min" value="18"><br>
-
-            <label for="max">Höchstalter:</label>
-            <input type="number" name="max" id="max" value="75"><br>
-
-            <button type="submit">🔍 Filtern</button>
-        </form>
     </div>
 
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/sw.js')
-                .then(reg => console.log('Service Worker registriert:', reg))
-                .catch(err => console.error('SW Fehler:', err));
+                .then(reg => console.log('✅ Service Worker registriert'))
+                .catch(err => console.error('❌ SW Fehler:', err));
         }
 
         function toggleTheme() {
             const html = document.documentElement;
-            if (html.getAttribute('data-theme') === 'dark') {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+
+            if (isDark) {
                 html.removeAttribute('data-theme');
                 localStorage.setItem('theme', 'light');
             } else {
@@ -191,60 +576,80 @@
             const element = document.getElementById(elementId);
             const text = element.textContent;
 
-            // Moderne Clipboard API
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
-                    showCopyFeedback(elementId);
+                    showCopyFeedback(element);
                 }).catch(err => {
-                    console.error('Fehler beim Kopieren:', err);
-                    fallbackCopy(text);
+                    console.error('❌ Fehler beim Kopieren:', err);
+                    fallbackCopy(text, element);
                 });
             } else {
-                fallbackCopy(text);
+                fallbackCopy(text, element);
             }
         }
 
-        function fallbackCopy(text) {
+        function fallbackCopy(text, element) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
             textarea.style.position = 'fixed';
             textarea.style.opacity = '0';
             document.body.appendChild(textarea);
             textarea.select();
+
             try {
                 document.execCommand('copy');
-                showCopyFeedback();
+                showCopyFeedback(element);
             } catch (err) {
-                console.error('Fallback-Kopieren fehlgeschlagen:', err);
+                console.error('❌ Fallback-Kopieren fehlgeschlagen:', err);
             }
+
             document.body.removeChild(textarea);
         }
 
-        function showCopyFeedback(elementId) {
-            // Visuelles Feedback
-            const element = elementId ? document.getElementById(elementId) : null;
-            if (element) {
-                element.style.backgroundColor = '#4CAF50';
-                element.style.color = 'white';
-                element.style.padding = '2px 5px';
-                element.style.borderRadius = '3px';
-                element.style.transition = 'all 0.3s';
+        function showCopyFeedback(element) {
+            if (!element) return;
+
+            const parentField = element.closest('.person-field');
+            if (parentField) {
+                parentField.classList.add('copied-feedback');
+
+                // Badge-Feedback
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.textContent = '✓ Kopiert';
+                badge.style.position = 'absolute';
+                badge.style.top = '0.5rem';
+                badge.style.right = '0.5rem';
+                badge.style.animation = 'fadeInUp 0.3s ease';
+
+                parentField.style.position = 'relative';
+                parentField.appendChild(badge);
 
                 setTimeout(() => {
-                    element.style.backgroundColor = '';
-                    element.style.color = '';
-                    element.style.padding = '';
-                }, 1000);
+                    parentField.classList.remove('copied-feedback');
+                    badge.remove();
+                }, 2000);
             }
         }
 
-        // Lade gespeichertes Theme beim Start
-        (function () {
+        // Theme beim Start laden
+        (function() {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
         })();
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
     </script>
 </body>
 </html>
